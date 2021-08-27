@@ -1,34 +1,33 @@
 import { Task, State } from "../pages/TaskOrganizer";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Delete, Edit } from "@material-ui/icons"
 
 type Props = {
   list: State;
   idGet: Function;
   deleteTask: Function;
+  completedToggle: Function;
 };
 
 export function Tasks(props: Props) {
   if (props.list.filterCompleted) {
     return (
-      <Container className="bg-dark">
-        <Row>
-          <Col className="text-light">Name</Col>
-          <Col className="text-light">Completed</Col>
+      <Container className="rounded-4 border w-50">
+        <Row className="bg-dark">
+          <Col sm="5" className="d-flex justify-content-center text-light">Name</Col>
         </Row>
         <Row className="bg-secondary">
           <Col>
             {props.list.tasks.filter((v) => v.completed).map((obj: Task) => {
               return (
-                <Row key={obj.id}>
-                  <Col className="text-light">{obj.name}</Col>
-                  <Col className="text-light">
-                    {obj.completed ? "true" : "false"}
+                <Row className="align-items-center" key={obj.id}>
+                  <Col md="1"><Form.Check checked={obj.completed} onChange={(e) => props.completedToggle(obj.id, obj.name, e.target.checked)}></Form.Check></Col>
+                  <Col className="">{obj.name}</Col>
+                  <Col md="1">
+                    <Button onClick={() => props.idGet(obj.id, obj.name,)}><Edit></Edit></Button>
                   </Col>
-                  <Col>
-                    <Button onClick={() => props.idGet(obj.id, obj.name,)}>Edit</Button>
-                  </Col>
-                  <Col>
-                    <Button onClick={() => props.deleteTask(obj.id)}>DELETE</Button>
+                  <Col md="1">
+                    <Button onClick={() => props.deleteTask(obj.id)}><Delete></Delete></Button>
                   </Col>
                 </Row>
               );
@@ -40,32 +39,33 @@ export function Tasks(props: Props) {
   }
   else {
     return (
-      <Container className="bg-dark">
-        <Row>
-          <Col className="text-light">Name</Col>
-          <Col className="text-light">Completed</Col>
+      <Container className="rounded-4 border w-50">
+        <Row className="bg-dark">
+          <Col sm="5" className="d-flex justify-content-center text-light">Name</Col>
         </Row>
-        <Row className="bg-secondary">
-          <Col>
+        <Row >
+          <Col className="" >
             {props.list.tasks.map((obj: Task) => {
               return (
-                <Row key={obj.id}>
-                  <Col className="text-light">{obj.name}</Col>
-                  <Col className="text-light">
-                    {obj.completed ? "true" : "false"}
+                <Row className="align-items-center" key={obj.id}>
+                  <Col md="1">
+                    <Form.Check checked={obj.completed} onChange={(e) => props.completedToggle(obj.id, obj.name, e.target.checked)}></Form.Check>
                   </Col>
-                  <Col>
-                    <Button onClick={() => props.idGet(obj.id, obj.name,)}>Edit</Button>
+                  <Col className="">
+                    {obj.name}
                   </Col>
-                  <Col>
-                    <Button onClick={() => props.deleteTask(obj.id)}>DELETE</Button>
+                  <Col md="1">
+                    <Button onClick={() => props.idGet(obj.id, obj.name, obj.completed)}><Edit></Edit></Button>
+                  </Col>
+                  <Col md="1">
+                    <Button onClick={() => props.deleteTask(obj.id)}><Delete></Delete></Button>
                   </Col>
                 </Row>
               );
             })}
           </Col>
         </Row>
-      </Container>
+      </Container >
     )
   };
 }

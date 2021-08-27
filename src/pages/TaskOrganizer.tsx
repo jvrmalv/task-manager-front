@@ -7,8 +7,11 @@ import {
   Button,
   Modal,
   Form,
+  InputGroup
 } from "react-bootstrap";
+import { Search } from "@material-ui/icons"
 import { Tasks } from "../components/Tasks";
+import "./TaskOrganizer.scss"
 
 export type Task = {
   id: string;
@@ -165,6 +168,17 @@ function TaskOrganizer() {
       })
   }
 
+  const completedToggle = (id: string, name: string, newValue: boolean) => {
+    axios
+      .put(`/task/${id}`, { name: name, completed: newValue })
+      .then(() => axios.get('/task').then((response) => {
+        dispatch({ type: "FETCH_SUCCESS", payload: response.data })
+      }))
+      .catch((error) => {
+        dispatch({ type: "FETCH_ERROR" })
+      })
+  }
+
   const deleteTask = (id: string) => {
     axios
       .delete(`/task/${id}`)
@@ -204,22 +218,36 @@ function TaskOrganizer() {
 
   return (
     <div className="w-100">
-      <Container className="w-100" fluid>
-        <Row className="justify-content-between ">
-          <Col md="4">TaskManager</Col>
-          <p>completed</p>
-          <Form.Check checked={state.filterCompleted} onChange={() => dispatch({ type: "COMPLETED_TOGGLE" })}></Form.Check>
-          <Col>
-            <Form.Control value={state.searchValue} onChange={(e) => dispatch({ type: "SEARCH_VALUE", newValue: e.target.value })} ></Form.Control>
-            <Button onClick={searchTasks}></Button>
+      <Container className="h-100 w-100" fluid>
+        <Row className="justify-content-between">
+          <Col className="justify-self-start h-5" md="1">
+            <img className="img-fluid" alt="task manager" src="logo.png"></img>
           </Col>
-          <Col className="d-flex align-content-center" md="2">
-            <Form.Control value={state.createInputValue} onChange={(e) => dispatch({ type: "CREATE_INPUT_VALUE", newValue: e.target.value })}></Form.Control>
-            <Button onClick={() => submitHandler()}></Button>
+          <Col md="4" className="d-flex justify-self-end align-items-center justify-content-center">
+            <Form onSubmit={(e) => {
+              searchTasks()
+              e.preventDefault()
+            }}>
+              <InputGroup>
+                <Form.Control placeholder="Search" value={state.searchValue} onChange={(e) => dispatch({ type: "SEARCH_VALUE", newValue: e.target.value })} ></Form.Control>
+                <Button type="submit"><Search></Search></Button>
+              </InputGroup>
+            </Form>
+          </Col>
+        </Row>
+        <Row className="mt-5 mb-3 justify-content-center">
+          <Col className="d-flex align-items-center" md="2">
+            <InputGroup>
+              <Form.Control placeholder="Add Task" value={state.createInputValue} onChange={(e) => dispatch({ type: "CREATE_INPUT_VALUE", newValue: e.target.value })}></Form.Control>
+              <Button onClick={() => submitHandler()}></Button>
+            </InputGroup>
+          </Col>
+          <Col className="d-flex align-items-center" md="1">
+            <Form.Check checked={state.filterCompleted} label="Completed" onChange={() => dispatch({ type: "COMPLETED_TOGGLE" })}></Form.Check>
           </Col>
         </Row>
         <Row>
-          <Tasks deleteTask={deleteTask} idGet={updateModal} list={state}></Tasks>
+          <Tasks completedToggle={completedToggle} deleteTask={deleteTask} idGet={updateModal} list={state}></Tasks>
         </Row>
       </Container>
       <Modal show={state.modal} onHide={() => dispatch({ type: "MODAL_TOGGLE" })}>
@@ -227,9 +255,20 @@ function TaskOrganizer() {
           <Modal.Title>Change Task</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form.Control value={state.updateInputValue} onChange={(e) => dispatch({ type: "UPDATE_INPUT_VALUE", newValue: e.target.value })}></Form.Control>
-          <Form.Check checked={state.updateCheckValue} onChange={(e) => dispatch({ type: "UPDATE_CHECK_VALUE", newValue: e.target.checked })}></Form.Check>
-          <Button onClick={() => updateHandler()}>Change</Button>
+          <Form onSubmit={(e) => {
+            updateHandler()
+            e.preventDefault()
+          }}>
+            <InputGroup>
+              <Form.Control value={state.updateInputValue} onChange={(e) => dispatch({ type: "UPDATE_INPUT_VALUE", newValue: e.target.value })}></Form.Control>
+              <Button type="submit">Change</Button>
+            </InputGroup>
+            <Row>
+              <InputGroup className="mt-4 ml-4">
+                <Form.Check label="Completed" checked={state.updateCheckValue} onChange={(e) => dispatch({ type: "UPDATE_CHECK_VALUE", newValue: e.target.checked })}></Form.Check>
+              </InputGroup>
+            </Row>
+          </Form>
         </Modal.Body>
       </Modal>
     </div>
