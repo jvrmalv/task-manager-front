@@ -242,10 +242,15 @@ function TaskOrganizer() {
         </Row>
         <Row className="mt-5 mb-3 justify-content-center">
           <Col className="d-flex align-items-center" md="2">
-            <InputGroup>
-              <Form.Control placeholder="Add Task" value={state.createInputValue} onChange={(e) => dispatch({ type: "CREATE_INPUT_VALUE", newValue: e.target.value })}></Form.Control>
-              <Button onClick={() => submitHandler()}><Add></Add></Button>
-            </InputGroup>
+            <Form onSubmit={(e) => {
+              submitHandler()
+              e.preventDefault()
+            }}>
+              <InputGroup>
+                <Form.Control placeholder="Add Task" value={state.createInputValue} onChange={(e) => dispatch({ type: "CREATE_INPUT_VALUE", newValue: e.target.value })}></Form.Control>
+                <Button type="submit"><Add></Add></Button>
+              </InputGroup>
+            </Form>
           </Col>
           <Col className="d-flex align-items-center" md="1">
             <Form.Check checked={state.filterCompleted} label="Completed" onChange={() => dispatch({ type: "COMPLETED_TOGGLE" })}></Form.Check>
