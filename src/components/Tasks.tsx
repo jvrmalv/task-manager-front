@@ -2,6 +2,7 @@ import { Task, State } from "../pages/TaskOrganizer";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { Delete, Edit } from "@material-ui/icons"
 
+//typing of the props containing "list" State prop and callbacks for the buttons and checktoggle
 type Props = {
   list: State;
   idGet: Function;

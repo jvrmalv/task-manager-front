@@ -9,10 +9,10 @@ import {
   Form,
   InputGroup
 } from "react-bootstrap";
-import { Search } from "@material-ui/icons"
+import { Search, Add } from "@material-ui/icons"
 import { Tasks } from "../components/Tasks";
 import "./TaskOrganizer.scss"
-
+// Typing for Reducer arguments
 export type Task = {
   id: string;
   name: string;
@@ -62,7 +62,7 @@ type Action =
   | { type: "COMPLETED_TOGGLE" };
 
 
-
+// This reducer will handle all state changes in the application by means of the dispatch() of actions
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "FETCH_SUCCESS":
@@ -131,11 +131,12 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
+
 function TaskOrganizer() {
+  //state is our app state and dispatch is the function that will update our state
   const [state, dispatch] = useReducer(reducer, initialState);
 
-
-
+  // This callback will post request to the API and re-render state with a new get request
   const submitHandler = () => {
     if (state.createInputValue !== "") {
       axios
@@ -150,6 +151,7 @@ function TaskOrganizer() {
     }
   };
 
+  // this makes sure that when we open the modal, info will be corresponding to the respective task
   const updateModal = (id: string, name: string, completed: boolean) => {
     dispatch({ type: "CURR_ID", newValue: id })
     dispatch({ type: "UPDATE_INPUT_VALUE", newValue: name })
@@ -157,6 +159,7 @@ function TaskOrganizer() {
     dispatch({ type: "MODAL_TOGGLE" })
   }
 
+  //like submitHandler but for updating the task
   const updateHandler = () => {
     axios
       .put(`/task/${state.currID}`, { name: state.updateInputValue, completed: state.updateCheckValue })
@@ -167,7 +170,7 @@ function TaskOrganizer() {
         dispatch({ type: "FETCH_ERROR" })
       })
   }
-
+  // this callback is used on the check function
   const completedToggle = (id: string, name: string, newValue: boolean) => {
     axios
       .put(`/task/${id}`, { name: name, completed: newValue })
@@ -178,7 +181,7 @@ function TaskOrganizer() {
         dispatch({ type: "FETCH_ERROR" })
       })
   }
-
+  // this will just send a delete request to the api and re-render state with a new get
   const deleteTask = (id: string) => {
     axios
       .delete(`/task/${id}`)
@@ -188,7 +191,7 @@ function TaskOrganizer() {
           .then((response) => dispatch({ type: "FETCH_SUCCESS", payload: response.data }))
       })
   }
-
+  //this re-renders state with a new get with specified name param
   const searchTasks = () => {
     if (state.searchValue !== "") {
       axios
@@ -205,6 +208,8 @@ function TaskOrganizer() {
         .then((response) => dispatch({ type: "FETCH_SUCCESS", payload: response.data }))
     }
   }
+
+  // will render get response on mount
   useEffect(() => {
     axios
       .get("/task")
@@ -239,7 +244,7 @@ function TaskOrganizer() {
           <Col className="d-flex align-items-center" md="2">
             <InputGroup>
               <Form.Control placeholder="Add Task" value={state.createInputValue} onChange={(e) => dispatch({ type: "CREATE_INPUT_VALUE", newValue: e.target.value })}></Form.Control>
-              <Button onClick={() => submitHandler()}></Button>
+              <Button onClick={() => submitHandler()}><Add></Add></Button>
             </InputGroup>
           </Col>
           <Col className="d-flex align-items-center" md="1">
